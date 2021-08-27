@@ -2,8 +2,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 // import SequenceSunBurst from './SequenceSunburst';
 import RadialTree from './RadialTree';
-//import ZoomableChart from "./ZoomableChart"
-import FlameGraph from "../Components/FlameGraph"
+import ZoomableChart from "./ZoomableChart"
+import FlameGraph from "../pages/FlameGraph"
 
 function Home() {
     return (

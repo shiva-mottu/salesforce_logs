@@ -5,64 +5,113 @@ import ReactTooltip from "react-tooltip";
 export default function FlameGraphComponent(props) {
     const [data, setData] = useState({})
     useEffect(() => {
-        console.log("prps", props)
-        fetch('data.json', {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+        console.log(props)
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
             }
-        }).then(res => {
-            return res.json()
-        }).then(root => {
-            function getRandomColor(exists) {
-                var letters = '0123456789ABCDEF';
-                var color = '#';
-                if (exists) {
-                    color += "FF0000"
-                } else {
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
-                    }
+            return color;
+        }
 
-                    if (color === "#FF0000") {
-                        color = "#DC143C"
+        function getColor(groupColors, cpuTypeColors, json) {
+            let color = "";
+
+            if ("cpuType" in json) {
+                let type = json.cpuType;
+                color = cpuTypeColors[type]
+            }
+
+            if ("group" in json) {
+                let group = json.group;
+                color = groupColors[group]
+            }
+
+            if ("error" in json) {
+                color = "#FF0000"
+            }
+
+            return color;
+        }
+
+        let groupColors = {};
+        let cpuTypeColors = {};
+        function recursive(data, json) {
+
+            if ("cpuType" in json) {
+                if (!(json.cpuType in cpuTypeColors)) {
+                    let color = getRandomColor();
+                    cpuTypeColors[json.cpuType] = color;
+                }
+            }
+
+            if ("group" in json) {
+                if (!(json.group in groupColors)) {
+                    let color = getRandomColor();
+                    groupColors[json.group] = color;
+                }
+            }
+
+            console.log(groupColors)
+            console.log(cpuTypeColors)
+
+            let data_ = {
+                name: json.text + "--" + (((json.duration / 1000000) % 60000) / 1000).toFixed(2) + " sec",
+                value: Math.round(json.duration / 1000000),
+                backgroundColor: getColor(groupColors, cpuTypeColors, json),
+                color: '#fff',
+                //tooltip: json.text + "--" + (((json.duration / 1000000) % 60000) / 1000).toFixed(2) + " sec",
+                children: []
+            }
+            json.children.forEach((element, index) => {
+                if (index == 0) {
+                    if (element.timestamp - json.timestamp > 0) {
+                        data_.children.push({
+                            name: "",
+                            value: Math.round((element.timestamp - json.timestamp) / 1000000),
+                            backgroundColor: "#fff",
+                            color: '#fff',
+                            children: []
+                        })
                     }
                 }
-                return color;
-            }
-
-            function recursive(data, json) {
-                if (json.children.length === 0) return data
-                let data_ = {
-                    name: json.text,
-                    value: Math.round(json.duration / 1000000),
-                    backgroundColor: getRandomColor("error" in json),
-                    color: '#fff',
-                    children: []
+                else if (index == json.children.length - 1) {
+                    if (json.exitStamp - element.exitStamp > 0) {
+                        data_.children.push({
+                            name: "",
+                            value: Math.round((json.exitStamp - element.exitStamp) / 1000000),
+                            backgroundColor: "#fff",
+                            color: '#fff',
+                            children: []
+                        })
+                    }
                 }
-                let noChilds = json.children.filter(o => o.children.length === 0)
-                noChilds.map(o => {
-                    data_.children.push({
-                        name: o.text,
-                        value: Math.round(o.duration / 1000000),
-                        backgroundColor: getRandomColor("error" in o),
-                        color: '#fff',
-                        children: []
-                    })
-                })
-                json.children.filter(o => o.children.length !== 0).forEach(element => {
-                    data_.children.push(
-                        recursive(data, element)
-                    )
-                });
-                return data_
-            }
+                else if (index > 0 && index < json.children.length - 1) {
+                    if (json.children[index - 1].exitStamp - element.timestamp > 0) {
+                        data_.children.push({
+                            name: "",
+                            value: Math.round((json.children[index - 1].exitStamp - element.timestamp) / 1000000),
+                            backgroundColor: "#fff",
+                            color: '#fff',
+                            children: []
+                        })
+                    }
+                }
 
-            let data = recursive({}, root)
-            console.log(data)
+                data_.children.push(
+                    recursive(data, element)
+                )
+            });
+
+            return data_
+        }
+
+        if (Object.keys(props.data).length > 0) {
+            let data = recursive({}, props.data)
             setData(data)
-        })
-        // setData(props)
+        }
+
     }, [props])
 
     return (
@@ -77,28 +126,6 @@ export default function FlameGraphComponent(props) {
                         console.log(`"${node.name}" focused`);
                     }}
                 />
-
-                // <FlameGraph
-                //     data={data}
-                //     height={props.height ? props.height : 500}
-                //     width={props.width ? props.width : 1000}
-                //     disableDefaultTooltips={true}
-                //     onMouseOver={(event, itemData) => (
-                //         // event is the React event
-                //         <>
-                //             <a data-tip="React-tooltip"> ◕‿‿◕ </a>
-                //             <ReactTooltip place="top" type="dark" effect="float" />
-                //         </>
-                //         // itemData belongs to the hovered flamegraph node;
-                //         // it is a node of the larger "data" object passed to FlameGraph.
-                //     )}
-                //     onMouseOut={(event, itemData) => {
-                //         // ...
-                //     }}
-                //     onMouseMove={(event, itemData) => {
-                //         // ...
-                //     }}
-                // />
             }
         </div>
     )
