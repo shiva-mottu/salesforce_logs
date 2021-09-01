@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FlameGraph } from 'react-flame-graph';
 import { Container, Row, Col, Button } from 'reactstrap';
+import "../pages/StyleSheets/flameGraph.css"
 
 const colors = {
     method: "#007AFF",
@@ -184,14 +185,14 @@ export default function FlameGraphComponent(props) {
                     <div>
                         {Object.keys(colors).map(name => {
                             if (name !== "others") {
-                                return <Button style={{ background: colors[name], color: "white", padding: "5px", marginLeft: "5px" }}>{name.toUpperCase()}</Button>
+                                return <Button className="legend-button" style={{ background: colors[name], color: "white", padding: "5px", marginLeft: "5px" }}>{name.toUpperCase()}</Button>
                             }
                         })}
                     </div>
 
                 </Col>
                 <Col>
-                    <div style={{ background: "red", borderRadius: "5px", color: "white", padding: "25px 50px 75px" }}>
+                    <div className="errorMsg" >
                         <h3>Error Messages</h3>
                         {errMsg.map(text => (
                             <>
