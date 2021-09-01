@@ -15,6 +15,6 @@ export default function FlameGraph(props) {
         })
     }, [props])
     return (
-        <FlameGraphComponent data={data} height={550} width={1900} />
+        <FlameGraphComponent data={data} height={300} width={1900} />
     )
 }

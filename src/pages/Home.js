@@ -1,9 +1,10 @@
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-// import SequenceSunBurst from './SequenceSunburst';
+//import SequenceSunBurst from './SequenceSunburst';
 import RadialTree from './RadialTree';
-import ZoomableChart from "./ZoomableChart"
+//import ZoomableChart from "./ZoomableChart"
 import FlameGraph from "../pages/FlameGraph"
+import TreeGraph from "./Tree"
 
 function Home() {
     return (
@@ -13,6 +14,7 @@ function Home() {
                 <Tab>RadialTree</Tab>
                 <Tab>ZoomableChart</Tab>
                 <Tab>FlameGraph</Tab>
+                <Tab>Tree Graph</Tab>
             </TabList>
 
             {/* <TabPanel>
@@ -28,6 +30,10 @@ function Home() {
 
             <TabPanel>
                 <FlameGraph />
+            </TabPanel>
+
+            <TabPanel>
+                <TreeGraph />
             </TabPanel>
         </Tabs>
     );

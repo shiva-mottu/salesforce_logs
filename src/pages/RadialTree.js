@@ -57,16 +57,16 @@ class RadialTree extends Component {
 
         let name = ""
         if (parentName != "") {
-          if (json.text.includes("(")) {
-            name = parentName + "-" + json.text.split("(")[0]
+          if (json.name.includes("(")) {
+            name = parentName + "-" + json.name.split("(")[0]
           } else {
-            name = parentName + "-" + json.text
+            name = parentName + "-" + json.name
           }
         } else {
-          if (json.text.includes("(")) {
-            name = json.text.split("(")[0]
+          if (json.name.includes("(")) {
+            name = json.name.split("(")[0]
           } else {
-            name = json.text
+            name = json.name
           }
         }
         parentName = name
@@ -80,10 +80,10 @@ class RadialTree extends Component {
         let noChilds = json.children.filter(o => o.children.length === 0)
         noChilds.map(o => {
           let lstChildName = "";
-          if (o.text.includes("(")) {
-            lstChildName = parentName + "-" + o.text.split("(")[0]
+          if (o.name.includes("(")) {
+            lstChildName = parentName + "-" + o.name.split("(")[0]
           } else {
-            lstChildName = o.text
+            lstChildName = o.name
           }
           let obj = {
             id: lstChildName,
