@@ -1,11 +1,18 @@
 import './App.css';
-import Home from "./pages/Home"
+import { BrowserRouter as Router, Route, Switch, } from "react-router-dom";
+import AnalyseCharts from "./pages/AnalyseCharts"
+import ViewLogs from "./pages/ViewLogs"
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Home />
+        <Router>
+          <Switch>
+            <Route path="/analyse_charts" component={AnalyseCharts} />
+            <Route path="/view_logs" component={ViewLogs} />
+          </Switch>
+        </Router>
       </header>
     </div>
   );

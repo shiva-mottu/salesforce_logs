@@ -3,51 +3,32 @@ import * as d3 from 'd3'
 import "./StyleSheets/sequenceSunburst.css"
 
 
-class SequenceSunBurst extends Component {
+class ZoomableSunBurst extends Component {
     constructor() {
         super();
-        this.partiton = this.partition.bind(this);
         this.zoomableGraph = this.zoomableGraph.bind(this);
     }
     componentDidMount() {
-        let data = {
-            name: "flare",
-            children: [
-                {
-                    name: "analytics", children: [
-                        { name: "cluster", children: [] },
-                        { name: "graph", children: [] },
-                        { name: "otimization", children: [] }
-                    ]
-                },
-                { name: "animate", children: [] },
-                { name: "data", children: [] },
-                { name: "display", children: [] },
-                { name: "flex", children: [] },
-                { name: "physics", children: [] },
-                { name: "query", children: [] },
-                { name: "scale", children: [] },
-                { name: "utile", children: [] },
-                { name: "vis", children: [] }
-            ]
-        }
-        this.zoomableGraph(data)
+        fetch('refined_data.json', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then(res => {
+            return res.json()
+        }).then(root => {
+            this.zoomableGraph(root)
+        })
     }
 
-    partition(data) {
-        const root = d3.hierarchy(data)
-            .sum(d => d.value)
-            .sort((a, b) => b.value - a.value);
-        return d3.partition()
-            .size([2 * Math.PI, root.height + 1])
-            (root);
-    }
+
 
     zoomableGraph(data) {
         let color = d3.scaleOrdinal(d3.quantize(d3.interpolateRainbow, data.children.length + 1))
         const format = () => { return d3.format(",d") }
         let width = 932;
         let radius = width / 6;
+        let height = 932;
 
         let arc = d3.arc()
             .startAngle(d => d.x0)
@@ -57,17 +38,24 @@ class SequenceSunBurst extends Component {
             .innerRadius(d => d.y0 * radius)
             .outerRadius(d => Math.max(d.y0 * radius, d.y1 * radius - 1))
 
-        //d3 = require("d3@6")
-        const root = this.partition(data);
+
+        function partition(data) {
+            const root = d3.hierarchy(data)
+                .sum(d => d.duration)
+                .sort((a, b) => b.duration - a.duration);
+            return d3.partition()
+                .size([2 * Math.PI, root.height + 1])
+                (root);
+        }
+
+        const root = partition(data);
 
         root.each(d => d.current = d);
 
         let svg = d3.select('#zoomableChart')
             .append('svg')
             .attr("viewBox", [0, 0, width, width])
-        // const svg = d3.create("svg")
-        //     .attr("viewBox", [0, 0, width, width])
-        //     .style("font", "10px sans-serif");
+            .style("font", "10px sans-serif");
 
         const g = svg.append("g")
             .attr("transform", `translate(${width / 2},${width / 2})`);
@@ -85,7 +73,7 @@ class SequenceSunBurst extends Component {
             .on("click", clicked);
 
         path.append("title")
-            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${format(d.value)}`);
+            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${format(d.size)}`);
 
         const label = g.append("g")
             .attr("pointer-events", "none")
@@ -153,24 +141,16 @@ class SequenceSunBurst extends Component {
             return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
         }
 
-        return svg.node();
+        //return svg.node();
     }
 
     render() {
         return (
             <div>
-                <div id="main">
-                    <div id="zoomSequence"></div>
-                    <div id="zoomableChart">
-                    </div>
-                </div>
-                <div id="sidebar">
-                    <input type="checkbox" id="togglelegend" /> Legend<br />
-                    <div id="legend" style={{ visibility: "hidden" }}></div>
-                </div>
+                <div id="zoomableChart" />
             </div>
         )
     }
 }
 
-export default SequenceSunBurst;
+export default ZoomableSunBurst;

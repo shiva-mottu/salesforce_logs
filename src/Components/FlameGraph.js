@@ -99,13 +99,15 @@ export default function FlameGraphComponent(props) {
             //     }
             // }
 
-            let processName = "Process Name: " + json.name + "\nDuration : " + (((json.duration / 1000000) % 60000) / 1000).toFixed(2) + " sec";
+            let processName = "Process Name: " + json.name + " | Duration : " + (((json.duration / 1000000) % 60000) / 1000).toFixed(2) + " sec";
+            let tooltipName = "Process Name: " + json.name + "\n Duration : " + (((json.duration / 1000000) % 60000) / 1000).toFixed(2) + " sec";
+
             let data_ = {
                 name: processName,
                 value: Math.round(json.duration / 1000000),
                 backgroundColor: getColor(colors, json),
                 color: '#fff',
-                tooltip: ("error" in json) ? processName + "\nError : " + json.error : processName,
+                tooltip: ("error" in json) ? tooltipName + "\nError : " + json.error : tooltipName,
                 children: []
             }
             json.children.forEach((element, index) => {
@@ -116,6 +118,7 @@ export default function FlameGraphComponent(props) {
                             value: Math.round((element.timestamp - json.timestamp) / 1000000),
                             backgroundColor: "#fff",
                             color: '#fff',
+                            //pointerEvents: "none !important",
                             children: []
                         })
                     }
